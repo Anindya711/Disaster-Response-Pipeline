@@ -4,7 +4,7 @@ In this project I am going to be analyze thousands of real messages provided by 
 Machine learning is critical to helping different organizations understand which messages are relevant to them and which messages to prioritize. During these disasters is when they have the least capacity to filter out messages that matter, and find basic methods such as using key word searches to provide trivial results. In this course, you'll learn the skills you need in ETL pipelines, natural language processing, and machine learning pipelines to create an amazing project with real world significance.
 
 **Structure** \
-The repository contains following folders.
+The repository contains following folders. \
 *1. app* - contains the files required to run the web app.\
 *2. models* - the trained machine learning model.\
 *3. data* - contains the data files required to run the the ETL pipeline.
