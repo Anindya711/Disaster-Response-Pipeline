@@ -27,24 +27,44 @@ stopWords = set(stopwords.words('english'))
 #import warning to ignore printing them
 import warnings
 warnings.filterwarnings("ignore")
+
+#importing the custom transformer which will return the average word length of
+#each text
 from custom_transformer import AverageWordLengthExtractor
 
 def load_data(database_filepath):
     # load data from database
+    '''
+        Takes as input the database path and returns the X,y, and categories as
+        list.
+        input : database filepath as string
+        output : X(Pandas series),y(Pandas DataFrame),categories(list)
+    '''
+
 
     engine = create_engine('sqlite:///'+database_filepath)
     df = pd.read_sql_table('DisasterMessages', engine)
     df.related = df.related.replace(2,1)
 
     #Splitting the data to get X, y values
-    #Our feature here is the message text, as we are only interested in classifying the text
+    #Our feature here is the message text, as we are only interested in
+    #classifying the text
     X = df.message
-    #all the categories will be our target as this is a multiclass classification problem
-    y = df[[col for col in df.columns if col not in  ['message', 'id', 'original','genre']]]
+    #all the categories will be our target as this is a multiclass
+    #classification problem
+    y = df[[col for col in df.columns if col not in
+     ['message', 'id', 'original','genre']]]
     categories = y.columns
     return X, y, categories
 
 def tokenize(text):
+
+    '''
+        Takes as imput the message text and converts to lowercase, strips the
+        spaces, tokenize it, removes the stopwords and then lemmatizes.
+        input : text (str)
+        output : clean tokens (list)
+    '''
 
     #tokenize text using word tokenize
     tokens = word_tokenize(text)
@@ -54,13 +74,15 @@ def tokenize(text):
 
     clean_tokens=[]
     stopwords=[]
-    #normalize case, lemmatize, strip leading/trailing whitespaces from the tokens
+    #normalize case, lemmatize, strip leading/trailing whitespaces from the
+    #tokens
     for token in tokens:
         #checking if the token is a stopword
         if token in stopWords:
             stopwords.append(token)
         else:
             token=token.lower().strip()
+            #lemmatizing the tokens
             token=lemmatizer.lemmatize(token)
             clean_tokens.append(token)
     return clean_tokens
@@ -69,44 +91,46 @@ def tokenize(text):
 
 def build_model():
     # text processing and model pipeline
+    '''
+        Builds a text processing pipeline using custom_transformer and other
+        text processing packages like CountVectorizer, TfidfTransformer.
 
+        output : model
     '''
-    model = Pipeline([('vect' ,  CountVectorizer(tokenizer=tokenize)),
-                     ('tfidf' , TfidfTransformer()),
-                     ('clf' , MultiOutputClassifier(RandomForestClassifier()))
-                    ])
-    parameters = {
-                    'vect__max_df': [0.9, 0.95],
-                    'vect__ngram_range': [(1,1), (1,2)],
-                    'clf__estimator__n_estimators' : [50,70]
-                    #'clf__estimator__min_samples_leaf': [1,2],
-                    #'clf__estimator__min_samples_split': [2,3,4]
-             }
-    '''
-    vect = Pipeline([('vect', CountVectorizer(tokenizer=tokenize, min_df=.0025, max_df=0.25, ngram_range=(1,3))),
+    # This pipeline will count the words, tokenize it, and then apply term
+    #Frequency inverse document frequency to it.
+    vect = Pipeline([('vect', CountVectorizer(tokenizer=tokenize,
+                        min_df=.0025, max_df=0.25, ngram_range=(1,3))),
                      ('tfidf', TfidfTransformer())
                     ])
     #print(vect.fit_transform(X))
+
+    #This pipeline will create another input feature which is the average length
+    #of all the words in that text and then apply standard scaler to it.
     text_length = Pipeline([('text_length', AverageWordLengthExtractor()),
                           ('scale', StandardScaler())
                          ])
-    #print(np.any(np.isnan(X)))
-    #print(text_length.fit_transform(X[:100]))
+    #Apply feature Union to combine bot the pipelines.
     feats = FeatureUnion([('vect', vect), ('text_length', text_length)])
     feature_processing = Pipeline([('feats', feats)])
-    #feature_processing.fit_transform(X_train)
+
+    #combining the features with estimator in a pipeline
+    #we are using MultiOutputClassifier here.
     model = Pipeline([
                            ('features',feats),
-                           ('classifier', MultiOutputClassifier(AdaBoostClassifier(random_state = 42)))
+                           ('classifier', MultiOutputClassifier(
+                           AdaBoostClassifier(random_state = 42)))
                         ])
-    #print(model.get_params().keys())
+
+    #defining the grid search parameters
     parameters = {
                    #'features__vect__vect__ngram_range'  : [(1,1), (1,2)],
                    'classifier__estimator__n_estimators' : [10,100,200],
-                   'classifier__estimator__learning_rate' : [0.01,0.03,0.05,0.07,0.1,0.2,0.5,1]
+                   'classifier__estimator__learning_rate' : [0.01,0.03,0.05,0.07
+                                                                ,0.1,0.2,0.5,1]
 
                  }
-
+   #Buidling the model using GridSearchCV
     model = GridSearchCV(model, param_grid=parameters, verbose=2, n_jobs = -1)
 
 
@@ -114,6 +138,11 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+
+    '''
+        evaluates the model performance and prints the classification report.
+        input : model, X_test, Y_test, category names(list)
+    '''
 
     Y_pred = model.predict(X_test)
 
