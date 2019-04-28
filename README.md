@@ -26,7 +26,7 @@ The Python script, *train_classifier.py*,will do the following steps :
 >5.Outputs results on the test set.\
 >6.Exports the final model as a pickle file.
 
-**3. Flask Web App** \ 
+**3. Flask Web App**
 >The results are then displayed via a web app built on flask. The user will enter a message and then 36 possible outputs are displayed
 on the screen.
 
