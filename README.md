@@ -1,4 +1,4 @@
-This project is
+This project will classify messages into multiple categories using various NLTK libraries.
 There are three components in this project.
 
 1. ETL Pipeline
