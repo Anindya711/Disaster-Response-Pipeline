@@ -1,12 +1,11 @@
 There are three components in this project.
 
-1. ETL Pipeline
-In a Python script, process_data.py, write a data cleaning pipeline that:
+*1. ETL Pipeline*
+The process.py script in data module will loads the messages and categories datasets and then
+1.Merges the two datasets
+2.Cleans the data
+3.Stores it in a SQLite database
 
-Loads the messages and categories datasets
-Merges the two datasets
-Cleans the data
-Stores it in a SQLite database
 2. ML Pipeline
 In a Python script, train_classifier.py, write a machine learning pipeline that:
 
