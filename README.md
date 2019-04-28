@@ -3,24 +3,34 @@ In this project I am going to be analyze thousands of real messages provided by 
 
 Machine learning is critical to helping different organizations understand which messages are relevant to them and which messages to prioritize. During these disasters is when they have the least capacity to filter out messages that matter, and find basic methods such as using key word searches to provide trivial results. In this course, you'll learn the skills you need in ETL pipelines, natural language processing, and machine learning pipelines to create an amazing project with real world significance.
 
+**Structure** \
+The repository contains following folders.
+*1. app* - contains the files required to run the web app.\
+*2. models* - the trained machine learning model.\
+*3. data* - contains the data files required to run the the ETL pipeline.
+
 There are three components in this project.
 
 **1. ETL Pipeline** \
-The process.py script in data module will loads the messages and categories datasets and then,\
->1.Merges the two datasets\
->2.Cleans the data\
->3.Stores it in a SQLite database\
+The process.py script in data module will load the messages and categories datasets and then,
+>1.Merges the two datasets.\
+>2.Cleans the data.\
+>3.Stores it in a SQLite database.
 
 **2. ML Pipeline** \
-In a Python script, train_classifier.py, write a machine learning pipeline that:\
->1.Loads data from the SQLite database\
->2.Splits the dataset into training and test sets\
->3.Builds a text processing and machine learning pipeline\
->4.Trains and tunes a model using GridSearchCV\
->5.Outputs results on the test set\
->6.Exports the final model as a pickle file\
+The Python script, train_classifier.py,will do the following steps :
+>1.Loads data from the SQLite database.\
+>2.Splits the dataset into training and test sets.\
+>3.Builds a text processing and machine learning pipeline.\
+>4.Trains and tunes a model using GridSearchCV.\
+>5.Outputs results on the test set.\
+>6.Exports the final model as a pickle file.
 
 **3. Flask Web App** \ 
+>The results are then displayed via a web app built on flask. The user will enter a message and then 36 possible outputs are displayed\
+on the screen.
+
+
 
 
 python process_data.py disaster_messages.csv disaster_categories.csv DisasterResponse.db
